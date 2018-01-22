@@ -11,6 +11,10 @@
           {% for post in blog_posts %}
           <h2><a href="/display?id={{post.id}}">{{post.title}}</a></h2>
           <p>{{post.body}}</p>
+          <p> Written by: {{author_name}} </p>
+
+          
+
               {% endfor %}
       {% endif %}
 

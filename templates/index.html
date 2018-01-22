@@ -1,0 +1,19 @@
+<!--  Redo to display all usernames-->
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h1>Build A Blog</h1>
+      <p> Please select from the following list of registered users to view blog posts: </p>
+      {% for each_name in usernames %}
+      <h2><a href="/blog?user_id={{each_name.id}}">{{each_name.username}}</a></h2>
+
+          {% endfor %}
+
+      <hr />
+
+
+
+</body>
+</html>
+{% endblock %}
