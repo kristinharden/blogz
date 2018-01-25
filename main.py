@@ -32,7 +32,7 @@ class User(db.Model):
 
 @app.before_request
 def require_login():
-    allowed_routes = ['display_login', "login", "signup_form", "sign_up", "list_blogs"]
+    allowed_routes = ["index", 'display_login', "login", "signup_form", "sign_up"]
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
@@ -48,28 +48,29 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.password == password:
             session['username'] = username
-            flash("Logged in")
+            flash("You are logged in.")
             return redirect('/newpost')
+        elif user == None:
+            error = 'Username does not exist.'
+            return render_template('login.html', error=error)
         else:
-            error = 'User password incorrect, or user does not exist.'
+            error = 'Incorrect password.'
             return render_template('login.html', error=error)
 
 @app.route('/logout')
 def logout():
     del session['username']
     flash("You have been logged out.")
-    return redirect('/blog')
+    return redirect('/')
 
 @app.route("/")
-def home():
+def index():
     users = User.query.all()
     return render_template("index.html", usernames = users)
 
 @app.route("/newpost")
 def show_form():
     user_id = User.query.filter_by(username=session['username']).first()
-    # id_num = request.args.get('user_id')
-    print("ID NUMBER = ", user_id)
     return render_template("add_posts.html")
 
 @app.route('/newpost', methods=["POST", "GET"])
@@ -95,29 +96,41 @@ def submit_form():
             db.session.commit()
             return redirect("/display?id="+str(new_post.id))
     else:
-        return render_template("add_posts.html", title = title,
-            body = body,
-            title_error = title_error,
-            body_error = body_error)
+        return render_template(
+                                "add_posts.html",
+                                title = title,
+                                body = body,
+                                title_error = title_error,
+                                body_error = body_error
+                                )
 
 @app.route("/blog", methods=["POST", "GET"])
 def list_blogs():
     id_num = request.args.get('user_id')
-    print("ID NUMBER = ", id_num)
-    author_name = User.query.filter_by(id = id_num).first()
-
-    if request.method == "GET" and 'username' in session:
-        # owner_id = User.query.filter_by(username= user.username).first().id
-        filtered_blog_posts = Blog.query.filter_by(owner_id = id_num).all()
-        return render_template("list_blogs.html", title="Build A Blog", blog_posts=filtered_blog_posts, author_name = author_name)
-
-                # Code to display all posts by logged-in user.
-                # owner_id = User.query.filter_by(username=session['username']).first().id
-                # blog_posts = Blog.query.filter_by(owner_id = owner_id).all()
-                # return render_template("list_blogs.html", title="Build A Blog", blog_posts=blog_posts)
+    print ("ID NUMBER IS ",id_num)
+    if id_num:
+        user_blog_posts = Blog.query.filter_by(owner_id = id_num).all()
+        user_name = User.query.filter_by(id = id_num).first().username
+        user_id = User.query.filter_by(id = id_num).first().id
+        return render_template(
+                                "list_blogs.html",
+                                title="Build A Blog",
+                                blog_posts=user_blog_posts,
+                                user_name = user_name,
+                                user_id = user_id
+                                )
     else:
         all_blog_posts = Blog.query.all()
-        return render_template("list_blogs.html", title="Build A Blog", blog_posts=all_blog_posts)
+        post_id = Blog.query.get('owner_id')
+        all_users = User.query.all()
+        user_name = None
+        return render_template(
+                                "list_blogs.html",
+                                title="Build A Blog",
+                                blog_posts=all_blog_posts,
+                                all_users=all_users,
+                                user_name = user_name
+                                )
 
 @app.route('/display', methods=['POST', 'GET'])
 def view_post():
@@ -125,10 +138,15 @@ def view_post():
     blog_post_entry = Blog.query.get(post_id)
     title_name = blog_post_entry.title
     body = blog_post_entry.body
+    author_id = blog_post_entry.owner_id
+    author = User.query.filter_by(id = author_id).first().username
+
     return render_template(
                             'display_post.html',
                             title_name = title_name,
                             body = body,
+                            author = author,
+                            author_id = author_id
                             )
 
 @app.route("/signup")
@@ -148,7 +166,7 @@ def sign_up():
 
         if len(username) <3 or len(username) > 20 or " " in username:
             user_error = "Username must be between 3 and 20 characters long and may not contain spaces."
-            user = ""
+            username = ""
 
         if len(password) <3 or len(password) > 20 or " " in password:
             pw_error = "Password must be between 3 and 20 characters long and may not contain spaces."
@@ -163,21 +181,25 @@ def sign_up():
                 db.session.add(new_user)
                 db.session.commit()
                 session['username'] = username
-                flash("You are logged in as {{username}}.")
+                flash("You are logged in!")
                 return redirect('/newpost')
             elif existing_user:
-                flash("This Username is already registered. Please register a different username or login to continue.")
-                return render_template("signup.html")
-            else:
+                user_error = "This Username is already registered. Please register a different username or login to continue."
                 return render_template("signup.html",
                     user_error = user_error,
                     pw_error = pw_error,
                     vpw_error = vpw_error,
-                    em_error = em_error,
-                    user = user,
+                    username = username,
                     password = "",
-                    validpw = "",
-                    em = em,)
+                    validpw = "")
+        else:
+            return render_template("signup.html",
+                user_error = user_error,
+                pw_error = pw_error,
+                vpw_error = vpw_error,
+                username = username,
+                password = "",
+                validpw = "")
 
 
 if __name__ == "__main__":

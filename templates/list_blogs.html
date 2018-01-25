@@ -9,13 +9,21 @@
       {% else %}
 
           {% for post in blog_posts %}
-          <h2><a href="/display?id={{post.id}}">{{post.title}}</a></h2>
-          <p>{{post.body}}</p>
-          <p> Written by: {{author_name}} </p>
+            <h2><a href="/display?id={{post.id}}">{{post.title}}</a></h2>
+            <p>{{post.body}}</p>
 
-          
+            {% if user_name %}
+              <p> Written by: <a href="/blog?user_id={{user_id}}">{{user_name}} </p>
 
-              {% endfor %}
+            {% else %}
+                {% for user_row in all_users %}
+                  {% if user_row.id == post.owner_id %}
+                    <p> Written by: <a href="/blog?user_id={{user_row.id}}">{{user_row.username}} </p>
+
+                  {% endif %}
+                {% endfor %}
+            {% endif %}
+          {% endfor %}
       {% endif %}
 
       <hr />

@@ -5,20 +5,29 @@
     </head>
 <body>
 
-    <div>
-        <a href='/blog'>Main Blog Page</a>
-    </div>
+    <div> <a href="/login">Log In</a> </div>
 
-    <div>
-          <a href='/newpost'>Add A Blog Entry</a>
-    </div>
+    <div> <a href='/'>Home</a> </div>
 
-    <div>
-          <a href='/logout'>Log Out</a>
-    </div>
+    <div> <a href='/newpost'>Add A Blog Entry</a> </div>
+
+    <div> <a href='/logout'>Log Out</a> </div>
+
+    <div> <a href='/signup'>Create Account</a> </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+          <h2>{{message}}</h2>
+        {% endfor %}
+    {% endwith %}
+
 
     {% block content %}
     {% endblock %}
+
+
+
+
 
 </body>
 </html>

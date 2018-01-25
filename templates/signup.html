@@ -1,26 +1,31 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>User Signup</title>
-    </head>
+{% extends "base.html" %}
 
-    <body>
-        <h1>Blogz User Signup</h1>
+{% block content %}
 
-        <form action="/signup" method="POST">
-            <label for="username"> Username:</label>
-            <input id="username" type="text" name="username" value = "{{username}}"/>
-            <p class = "error"> {{user_error}} </p>
-            <br>
-            <label for="password"> Password:</label>
-            <input id="password" type="password" name="password"/>
-            <p class = "error"> {{pw_error}} </p>
-            <br>
-            <label for="verify_password"> Verify Password:</label>
-            <input id="verify_password" type="password" name="verify_password"/>
-            <p class = "error"> {{vpw_error}} </p>
-            <br>
-            <input type="submit" value="Submit"/>
-        </form>
-    </body>
-</html>
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>User Signup</title>
+        </head>
+
+        <body>
+            <h1>Blogz User Signup</h1>
+
+            <form action="/signup" method="POST">
+                <label for="username"> Username:</label>
+                <input id="username" type="text" name="username" value = "{{username}}"/>
+                <p class = "error"> {{user_error}} </p>
+                <br>
+                <label for="password"> Password:</label>
+                <input id="password" type="password" name="password"/>
+                <p class = "error"> {{pw_error}} </p>
+                <br>
+                <label for="verify_password"> Verify Password:</label>
+                <input id="verify_password" type="password" name="verify_password"/>
+                <p class = "error"> {{vpw_error}} </p>
+                <br>
+                <input type="submit" value="Submit"/>
+            </form>
+        </body>
+    </html>
+    {% endblock %}
